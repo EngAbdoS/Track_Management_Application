@@ -24,7 +24,7 @@ secrets.json
 
 ## Internal phase-by-phase build log, not part of the submission
 backend/docs/
-
+docs/
 ## Frontend (Task 2)
 client/node_modules/
 client/dist/

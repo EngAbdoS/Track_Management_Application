@@ -1,0 +1,49 @@
+<header class="bar">
+  <div class="bar__inner">
+    <a class="brand" routerLink="/tracks">
+      <svg class="brand__mark" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.16" />
+        <path
+          d="M6 12.5v-1M9 15V9M12 17.5v-11M15 15V9M18 12.5v-1"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          fill="none"
+        />
+      </svg>
+      <span class="brand__name">Track Manager</span>
+    </a>
+
+    <nav class="nav" aria-label="Sections">
+      <a routerLink="/tracks" routerLinkActive="is-active">Tracks</a>
+      <a routerLink="/artists" routerLinkActive="is-active">Artists</a>
+      <a routerLink="/genres" routerLinkActive="is-active">Genres</a>
+    </nav>
+
+    <button
+      type="button"
+      class="theme-toggle"
+      (click)="theme.toggle()"
+      [attr.aria-label]="theme.resolved() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
+    >
+      @if (theme.resolved() === 'dark') {
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2" fill="currentColor" />
+          <path
+            d="M12 2.5v2.2M12 19.3v2.2M4.2 12H2M22 12h-2.2M6.3 6.3 4.8 4.8M19.2 19.2l-1.5-1.5M17.7 6.3l1.5-1.5M4.8 19.2l1.5-1.5"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+        </svg>
+      } @else {
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2Z"
+            fill="currentColor"
+          />
+        </svg>
+      }
+    </button>
+  </div>
+</header>
