@@ -17,7 +17,18 @@ if (app.Environment.IsDevelopment())
 {
     using (var scope = app.Services.CreateScope())
     {
-        await scope.ServiceProvider.GetRequiredService<DbSeeder>().SeedAsync();
+        // Sample data is a convenience, not a prerequisite — a seeding failure is logged loudly
+        // but must not stop the API from starting.
+        try
+        {
+            await scope.ServiceProvider.GetRequiredService<DbSeeder>().SeedAsync();
+        }
+        catch (Exception exception)
+        {
+            scope.ServiceProvider
+                .GetRequiredService<ILogger<Program>>()
+                .LogError(exception, "Database seeding failed; continuing without sample data.");
+        }
     }
 
     app.UseSwagger();
