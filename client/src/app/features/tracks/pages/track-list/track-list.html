@@ -1,0 +1,92 @@
+<div class="head">
+  <div>
+    <h1>Tracks</h1>
+    <p class="muted">The catalogue, and where each track sits in our workflow.</p>
+  </div>
+
+  @if (auth.canWrite()) {
+    <button appButton variant="primary" type="button" disabled title="Arrives in phase C7">
+      New track
+    </button>
+  }
+</div>
+
+<app-track-filters
+  [status]="status() ?? null"
+  [artistId]="artistId() ?? null"
+  [genre]="genre() ?? null"
+  [artists]="artists()"
+  (changed)="applyFilters($event)"
+/>
+
+@if (errorMessage(); as message) {
+  <div class="state" role="alert">
+    <p>{{ message }}</p>
+    <button appButton type="button" (click)="goToPage(currentPage())">Try again</button>
+  </div>
+} @else if (store.loading() && store.tracks().length === 0) {
+  <div class="table-wrap">
+    <app-skeleton [rows]="8" label="Loading tracks" />
+  </div>
+} @else if (store.isEmpty()) {
+  <div class="table-wrap">
+    <app-empty-state
+      [title]="hasFilters() ? 'No tracks match these filters' : 'No tracks yet'"
+      [detail]="
+        hasFilters()
+          ? 'Try a different status, artist or genre.'
+          : 'Tracks added to the catalogue will appear here.'
+      "
+    >
+      @if (hasFilters()) {
+        <button appButton type="button" (click)="applyFilters({ status: null, artistId: null, genre: null })">
+          Clear filters
+        </button>
+      }
+    </app-empty-state>
+  </div>
+} @else {
+  <div class="table-wrap" [class.is-stale]="store.loading()">
+    <table class="table">
+      <caption class="sr-only">
+        Tracks with their artist, genre and workflow status
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Title</th>
+          <th scope="col">Artist</th>
+          <th scope="col">Genre</th>
+          <th scope="col">ISRC</th>
+          <th scope="col">Release</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (track of store.tracks(); track track.id) {
+          <tr class="is-clickable" (click)="openTrack(track.id)">
+            <td>
+              <!-- The row is clickable for convenience, but the link is what carries the
+                   accessible name and keyboard focus: a <tr> can be neither. -->
+              <a class="cell-link" [routerLink]="['/tracks', track.id]" (click)="$event.stopPropagation()">
+                <bdi>{{ track.title }}</bdi>
+              </a>
+            </td>
+            <td><bdi>{{ track.artistName }}</bdi></td>
+            <td><bdi>{{ track.genreName }}</bdi></td>
+            <td class="code">{{ track.isrc }}</td>
+            <td class="num">{{ track.releaseDate }}</td>
+            <td><app-status-pill [status]="track.status" /></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination
+    [page]="store.result().page"
+    [pageSize]="store.result().pageSize"
+    [totalCount]="store.result().totalCount"
+    [totalPages]="store.result().totalPages"
+    (goTo)="goToPage($event)"
+  />
+}

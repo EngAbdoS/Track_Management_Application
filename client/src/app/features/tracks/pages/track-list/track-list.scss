@@ -1,0 +1,37 @@
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-block-end: var(--space-5);
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-7) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  text-align: center;
+}
+
+// Paging or re-filtering keeps the previous rows on screen and dims them, rather than
+// collapsing the table to a skeleton and making the page jump.
+.is-stale {
+  opacity: 0.55;
+  transition: opacity var(--t);
+}
+
+@media (width < 720px) {
+  .table {
+    th:nth-child(4),
+    td:nth-child(4),
+    th:nth-child(5),
+    td:nth-child(5) {
+      display: none;
+    }
+  }
+}
