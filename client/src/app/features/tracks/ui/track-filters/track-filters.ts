@@ -55,7 +55,11 @@ const GENRE_DEBOUNCE_MS = 300;
   styles: `
     .filters {
       display: flex;
-      align-items: flex-end;
+      /* Start, not end: the genre field carries a hint under its input, and aligning on
+         the bottom edge would push its control up out of line with the other two. Every
+         label is one line high, so aligning at the top puts all three controls on the
+         same line and lets the hint hang below. */
+      align-items: flex-start;
       gap: var(--space-4);
       flex-wrap: wrap;
       margin-block-end: var(--space-4);
@@ -65,8 +69,9 @@ const GENRE_DEBOUNCE_MS = 300;
       min-width: 190px;
     }
 
+    /* Sits on the control line rather than the label line above it. */
     .clear {
-      margin-block-end: 1px;
+      margin-block-start: calc(var(--text-base) * var(--leading-normal) + var(--space-2));
     }
   `,
 })
