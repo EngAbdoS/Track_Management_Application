@@ -1,3 +1,4 @@
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import {
   provideRouter,
@@ -7,6 +8,7 @@ import {
 } from '@angular/router';
 
 import { routes } from './app.routes';
+import { errorInterceptor } from './core/http/error.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -23,5 +25,7 @@ export const appConfig: ApplicationConfig = {
       withViewTransitions({ skipInitialTransition: true }),
       withInMemoryScrolling({ scrollPositionRestoration: 'top' }),
     ),
+    // The auth interceptor joins this list in phase C3, ahead of the error one.
+    provideHttpClient(withFetch(), withInterceptors([errorInterceptor])),
   ],
 };
