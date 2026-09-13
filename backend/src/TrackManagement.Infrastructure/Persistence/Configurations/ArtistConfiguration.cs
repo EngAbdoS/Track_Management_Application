@@ -14,6 +14,11 @@ public class ArtistConfiguration : AuditableEntityConfiguration<Artist>
         builder.Property(a => a.Email).IsRequired().HasMaxLength(256);
         builder.Property(a => a.Country).IsRequired().HasMaxLength(2);
 
+        // Filtered, so a soft-deleted artist doesn't reserve their email address forever.
+        builder.HasIndex(a => a.Email)
+            .IsUnique()
+            .HasFilter("\"IsDeleted\" = 0");
+
         builder.HasMany(a => a.Tracks)
             .WithOne(t => t.Artist)
             .HasForeignKey(t => t.ArtistId)
