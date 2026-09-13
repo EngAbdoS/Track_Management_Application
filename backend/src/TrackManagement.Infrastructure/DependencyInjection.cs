@@ -3,7 +3,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using TrackManagement.Application.Common.Interfaces;
+using TrackManagement.Application.Common.Text;
 using TrackManagement.Infrastructure.Auth;
+using TrackManagement.Infrastructure.Text;
 using TrackManagement.Infrastructure.Persistence;
 using TrackManagement.Infrastructure.Persistence.Seed;
 
@@ -26,6 +28,7 @@ public static class DependencyInjection
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
         services.AddSingleton<IPasswordHasher, PasswordHasherAdapter>();
         services.AddSingleton<ITokenService, JwtTokenService>();
+        services.AddSingleton<IArabicAwareNormalizer, ArabicAwareNormalizer>();
         services.AddScoped<DbSeeder>();
 
         return services;
