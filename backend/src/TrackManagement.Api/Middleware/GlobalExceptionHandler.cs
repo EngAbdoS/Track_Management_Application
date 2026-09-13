@@ -15,6 +15,8 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         var problem = exception switch
         {
             ValidationException validation => CreateValidationProblem(validation),
+            InvalidCredentialsException => CreateProblem(
+                StatusCodes.Status401Unauthorized, "Unauthorized", exception.Message),
             NotFoundException => CreateProblem(StatusCodes.Status404NotFound, "Not found", exception.Message),
             ConflictException => CreateProblem(StatusCodes.Status409Conflict, "Conflict", exception.Message),
             _ => null
@@ -32,7 +34,10 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         }
 
         httpContext.Response.StatusCode = problem.Status!.Value;
-        await httpContext.Response.WriteAsJsonAsync(problem, cancellationToken);
+
+        // Serialized as object so the runtime type wins: typed as ProblemDetails, the compile-time
+        // type would silently drop ValidationProblemDetails.Errors.
+        await httpContext.Response.WriteAsJsonAsync<object>(problem, cancellationToken);
 
         return true;
     }

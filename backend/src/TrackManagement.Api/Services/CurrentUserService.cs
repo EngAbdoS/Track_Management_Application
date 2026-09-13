@@ -1,4 +1,4 @@
-using System.Security.Claims;
+using TrackManagement.Application.Common.Auth;
 using TrackManagement.Application.Common.Interfaces;
 
 namespace TrackManagement.Api.Services;
@@ -9,7 +9,7 @@ public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICur
     {
         get
         {
-            var claim = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var claim = httpContextAccessor.HttpContext?.User.FindFirst(AuthClaimTypes.UserId)?.Value;
             return Guid.TryParse(claim, out var id) ? id : null;
         }
     }

@@ -1,7 +1,14 @@
+using System.Text;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using TrackManagement.Api.Middleware;
 using TrackManagement.Api.Services;
+using TrackManagement.Application.Common.Auth;
 using TrackManagement.Application.Common.Interfaces;
+using TrackManagement.Infrastructure.Auth;
 
 namespace TrackManagement.Api;
 
@@ -11,7 +18,12 @@ public static class DependencyInjection
 
     public static IServiceCollection AddApi(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddControllers();
+        // Enums cross the wire as names ("Viewer", "Distributed"), not ordinals — readable for
+        // clients, and immune to a reordered enum silently changing meaning.
+        services.AddControllers()
+            .AddJsonOptions(options =>
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
 
@@ -28,8 +40,43 @@ public static class DependencyInjection
         }));
 
         services.AddSwagger();
+        services.AddJwtAuth(configuration);
 
         return services;
+    }
+
+    private static void AddJwtAuth(this IServiceCollection services, IConfiguration configuration)
+    {
+        var jwt = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();
+        jwt.Validate();
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                // Claims are written and read under the same short names; without this, the handler
+                // rewrites "sub" and "role" to long URIs and role checks silently stop matching.
+                options.MapInboundClaims = false;
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwt.Issuer,
+                    ValidAudience = jwt.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.SigningKey)),
+                    NameClaimType = AuthClaimTypes.Username,
+                    RoleClaimType = AuthClaimTypes.Role,
+                    ClockSkew = TimeSpan.FromSeconds(30)
+                };
+            });
+
+        // Authenticated by default; endpoints opt out with [AllowAnonymous].
+        services.AddAuthorizationBuilder()
+            .SetFallbackPolicy(new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build());
     }
 
     private static void AddSwagger(this IServiceCollection services)
