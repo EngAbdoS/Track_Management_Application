@@ -4,10 +4,12 @@ import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { describeApiError, parseApiError, toControlName } from '../../../core/http/api-error';
+import { Button } from '../../../shared/ui/button/button';
+import { Field } from '../../../shared/ui/field/field';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, Button, Field],
   templateUrl: './login.html',
   styleUrl: './login.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

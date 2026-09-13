@@ -9,9 +9,9 @@
       <p class="banner" role="alert">{{ message }}</p>
     }
 
-    <label class="field">
-      <span class="field__label">Username</span>
+    <app-field label="Username" [error]="isInvalid('username') ? errorFor('username') : null">
       <input
+        type="text"
         formControlName="username"
         autocomplete="username"
         autocapitalize="none"
@@ -19,13 +19,9 @@
         required
         [attr.aria-invalid]="isInvalid('username')"
       />
-      @if (isInvalid('username')) {
-        <span class="field__error">{{ errorFor('username') }}</span>
-      }
-    </label>
+    </app-field>
 
-    <label class="field">
-      <span class="field__label">Password</span>
+    <app-field label="Password" [error]="isInvalid('password') ? errorFor('password') : null">
       <input
         type="password"
         formControlName="password"
@@ -33,12 +29,9 @@
         required
         [attr.aria-invalid]="isInvalid('password')"
       />
-      @if (isInvalid('password')) {
-        <span class="field__error">{{ errorFor('password') }}</span>
-      }
-    </label>
+    </app-field>
 
-    <button type="submit" class="submit" [disabled]="pending()">
+    <button appButton variant="primary" type="submit" [disabled]="pending()">
       {{ pending() ? 'Signing in…' : 'Sign in' }}
     </button>
 

@@ -1,6 +1,3 @@
-// Local styles for now — the shared field/button primitives land in C4 and this
-// screen moves onto them.
-
 .shell {
   display: grid;
   place-items: center;
@@ -30,63 +27,9 @@
   border: 1px solid var(--dsp-rejected);
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--dsp-rejected) 10%, transparent);
-  color: var(--text);
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-
-  &__label {
-    font-weight: 550;
-  }
-
-  &__error {
-    color: var(--dsp-rejected);
-    font-size: var(--text-sm);
-  }
-
-  input {
-    padding: var(--space-3);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius);
-    background: var(--bg);
-    transition: border-color var(--t-fast), box-shadow var(--t-fast);
-
-    &:focus-visible {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-quiet);
-    }
-
-    &[aria-invalid='true'] {
-      border-color: var(--dsp-rejected);
-    }
-  }
-}
-
-.submit {
-  padding: var(--space-3);
-  border: 1px solid transparent;
-  border-radius: var(--radius);
-  background: var(--accent);
-  color: var(--accent-contrast);
-  font-weight: 600;
-  transition: background var(--t-fast);
-
-  &:hover:not(:disabled) {
-    background: var(--accent-hover);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: progress;
-  }
 }
 
 .hint {
-  margin-block-start: var(--space-1);
   padding-block-start: var(--space-4);
   border-block-start: 1px solid var(--border);
   color: var(--text-muted);

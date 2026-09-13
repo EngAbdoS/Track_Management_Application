@@ -1,0 +1,63 @@
+// Native controls are styled globally rather than wrapped in components: app-field
+// projects whatever control the page provides, and global rules keep that working
+// without ::ng-deep or a component per input type.
+
+input[type='text'],
+input[type='search'],
+input[type='password'],
+input[type='number'],
+input[type='date'],
+input[type='url'],
+select,
+textarea {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  transition:
+    border-color var(--t-fast),
+    box-shadow var(--t-fast);
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-quiet);
+  }
+
+  &[aria-invalid='true'] {
+    border-color: var(--dsp-rejected);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+select {
+  // The native arrow disappears against a dark surface in some browsers, so the
+  // control draws its own.
+  appearance: none;
+  padding-inline-end: var(--space-6);
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) calc(50% + 2px),
+    calc(100% - 13px) calc(50% + 2px);
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+
+input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
