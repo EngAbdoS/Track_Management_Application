@@ -1,0 +1,92 @@
+<p class="back">
+  <a routerLink="/tracks">&larr; All tracks</a>
+</p>
+
+@if (errorMessage(); as message) {
+  <div class="state" role="alert">
+    <p>{{ message }}</p>
+    <button appButton type="button" (click)="store.load(id())">Try again</button>
+  </div>
+} @else if (store.loading() && !store.track()) {
+  <app-skeleton [rows]="6" label="Loading track" />
+} @else if (store.track(); as track) {
+  <header class="head">
+    <div class="head__main">
+      <h1><bdi>{{ track.title }}</bdi></h1>
+      <p class="muted">
+        <bdi>{{ track.artistName }}</bdi> · <bdi>{{ track.genreName }}</bdi>
+      </p>
+    </div>
+
+    <div class="head__status">
+      <app-status-pill [status]="track.status" />
+      <!-- Said explicitly, because track.status cannot answer it: a Distributed track
+           whose DSPs all rejected it is live nowhere. -->
+      <p class="live muted">
+        @if (store.distributions().length === 0) {
+          Not sent to any DSP yet
+        } @else if (store.isLive()) {
+          Live on {{ store.liveCount() }} of {{ store.distributions().length }} DSPs
+        } @else {
+          Live on no DSPs
+        }
+      </p>
+    </div>
+  </header>
+
+  <dl class="facts">
+    <div><dt>ISRC</dt><dd class="code">{{ track.isrc }}</dd></div>
+    <div><dt>Release date</dt><dd class="num">{{ track.releaseDate }}</dd></div>
+    <div><dt>Artist</dt><dd><bdi>{{ track.artistName }}</bdi></dd></div>
+    <div><dt>Genre</dt><dd><bdi>{{ track.genreName }}</bdi></dd></div>
+  </dl>
+
+  <section class="section">
+    <div class="section__head">
+      <h2>Distribution</h2>
+      @if (auth.canWrite()) {
+        <button appButton variant="primary" small type="button" disabled title="Arrives in phase C7">
+          Distribute
+        </button>
+      }
+    </div>
+
+    @if (store.distributions().length === 0) {
+      <div class="table-wrap">
+        <app-empty-state
+          title="Not distributed yet"
+          detail="This track has not been submitted to any DSP."
+        />
+      </div>
+    } @else {
+      <app-distributions-table [distributions]="store.distributions()" />
+    }
+
+    <p class="legend muted">
+      <strong>Two different statuses.</strong>
+      The pill above is where the track sits in our workflow — “Distributed” means we sent it.
+      Each row below is what one DSP did with it. They move independently.
+    </p>
+  </section>
+
+  <section class="section">
+    <h2>Metadata</h2>
+    @if (metadataRows().length === 0) {
+      <p class="muted">No metadata recorded.</p>
+    } @else {
+      <dl class="facts">
+        @for (row of metadataRows(); track row.label) {
+          <div>
+            <dt>{{ row.label }}</dt>
+            <dd [class.code]="row.mono">{{ row.value }}</dd>
+          </div>
+        }
+      </dl>
+    }
+  </section>
+
+  <section class="section">
+    <h2>Track history</h2>
+    <app-status-timeline [entries]="track.statusHistory" />
+  </section>
+}
