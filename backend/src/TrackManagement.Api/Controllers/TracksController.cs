@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using TrackManagement.Application.Common.Pagination;
 using TrackManagement.Application.Tracks.Commands.CreateTrack;
 using TrackManagement.Application.Tracks.Commands.UpdateTrack;
+using TrackManagement.Application.Tracks.Commands.UpsertTrackMetadata;
 using TrackManagement.Application.Tracks.Dtos;
 using TrackManagement.Application.Tracks.Queries.GetTrackById;
 using TrackManagement.Application.Tracks.Queries.GetTracks;
@@ -63,5 +64,32 @@ public class TracksController(ISender sender) : ControllerBase
         CancellationToken cancellationToken) =>
         Ok(await sender.Send(
             new UpdateTrackCommand(id, request.Title, request.GenreId, request.Isrc, request.ReleaseDate),
+            cancellationToken));
+
+    /// <summary>
+    /// Replaces a track's metadata, creating it if absent. Every field is optional, and omitted
+    /// fields are cleared rather than left unchanged.
+    /// </summary>
+    [HttpPut("{id:guid}/metadata")]
+    [Authorize(Roles = nameof(Role.Distributor))]
+    [ProducesResponseType<TrackMetadataDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<TrackMetadataDto>> UpsertMetadata(
+        Guid id,
+        UpsertTrackMetadataRequest request,
+        CancellationToken cancellationToken) =>
+        Ok(await sender.Send(
+            new UpsertTrackMetadataCommand(
+                id,
+                request.DurationSeconds,
+                request.Bpm,
+                request.Iswc,
+                request.Language,
+                request.IsExplicit,
+                request.Label,
+                request.CoverArtUrl,
+                request.CopyrightLine),
             cancellationToken));
 }
