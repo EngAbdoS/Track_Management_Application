@@ -1,0 +1,53 @@
+<div class="shell">
+  <form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="head">
+      <h1>Sign in</h1>
+      <p class="muted">The catalogue is available to signed-in staff only.</p>
+    </div>
+
+    @if (error(); as message) {
+      <p class="banner" role="alert">{{ message }}</p>
+    }
+
+    <label class="field">
+      <span class="field__label">Username</span>
+      <input
+        formControlName="username"
+        autocomplete="username"
+        autocapitalize="none"
+        spellcheck="false"
+        required
+        [attr.aria-invalid]="isInvalid('username')"
+      />
+      @if (isInvalid('username')) {
+        <span class="field__error">{{ errorFor('username') }}</span>
+      }
+    </label>
+
+    <label class="field">
+      <span class="field__label">Password</span>
+      <input
+        type="password"
+        formControlName="password"
+        autocomplete="current-password"
+        required
+        [attr.aria-invalid]="isInvalid('password')"
+      />
+      @if (isInvalid('password')) {
+        <span class="field__error">{{ errorFor('password') }}</span>
+      }
+    </label>
+
+    <button type="submit" class="submit" [disabled]="pending()">
+      {{ pending() ? 'Signing in…' : 'Sign in' }}
+    </button>
+
+    @if (showDevAccounts) {
+      <p class="hint">
+        Development accounts —
+        <span class="code">distributor / Distributor#123</span> (full access),
+        <span class="code">viewer / Viewer#123</span> (read-only).
+      </p>
+    }
+  </form>
+</div>

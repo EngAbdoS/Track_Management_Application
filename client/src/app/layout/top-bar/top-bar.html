@@ -14,15 +14,19 @@
       <span class="brand__name">Track Manager</span>
     </a>
 
-    <nav class="nav" aria-label="Sections">
-      <a routerLink="/tracks" routerLinkActive="is-active">Tracks</a>
-      <a routerLink="/artists" routerLinkActive="is-active">Artists</a>
-      <a routerLink="/genres" routerLinkActive="is-active">Genres</a>
-    </nav>
+    @if (auth.isAuthenticated()) {
+      <nav class="nav" aria-label="Sections">
+        <a routerLink="/tracks" routerLinkActive="is-active">Tracks</a>
+        <a routerLink="/artists" routerLinkActive="is-active">Artists</a>
+        <a routerLink="/genres" routerLinkActive="is-active">Genres</a>
+      </nav>
+    } @else {
+      <span class="spacer"></span>
+    }
 
     <button
       type="button"
-      class="theme-toggle"
+      class="icon-button"
       (click)="theme.toggle()"
       [attr.aria-label]="theme.resolved() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
     >
@@ -38,12 +42,21 @@
         </svg>
       } @else {
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2Z"
-            fill="currentColor"
-          />
+          <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2Z" fill="currentColor" />
         </svg>
       }
     </button>
+
+    @if (auth.user(); as user) {
+      <div class="user">
+        <span class="user__name">{{ user.username }}</span>
+        <!-- The role is shown, not just enforced: a Viewer seeing fewer buttons should
+             be able to tell why. -->
+        <span class="user__role" [class.user__role--viewer]="user.role === 'Viewer'">
+          {{ user.role }}
+        </span>
+      </div>
+      <button type="button" class="sign-out" (click)="signOut()">Sign out</button>
+    }
   </div>
 </header>
