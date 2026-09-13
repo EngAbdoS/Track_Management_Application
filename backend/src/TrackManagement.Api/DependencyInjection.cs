@@ -102,6 +102,8 @@ public static class DependencyInjection
                 options.IncludeXmlComments(xmlPath);
             }
 
+            options.OperationFilter<AuthResponsesOperationFilter>();
+
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name = "Authorization",

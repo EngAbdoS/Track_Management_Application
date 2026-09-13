@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TrackManagement.Application.Common.Interfaces;
 using TrackManagement.Application.Tracks.Dtos;
+using TrackManagement.Application.Tracks.Queries;
 using TrackManagement.Domain.Common;
 using TrackManagement.Domain.Exceptions;
 
@@ -71,9 +72,6 @@ public class UpdateTrackCommandHandler(IApplicationDbContext context)
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new TrackDetailDto(
-            track.Id, track.Title, track.Isrc, track.ReleaseDate, track.Status,
-            track.ArtistId, track.Artist.Name, genre.Id, genre.Name,
-            Metadata: null, Distributions: [], StatusHistory: []);
+        return await context.GetDetailAsync(track.Id, cancellationToken);
     }
 }

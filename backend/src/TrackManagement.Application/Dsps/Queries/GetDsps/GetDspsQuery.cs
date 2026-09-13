@@ -1,10 +1,9 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TrackManagement.Application.Common.Interfaces;
+using TrackManagement.Application.Dsps.Dtos;
 
 namespace TrackManagement.Application.Dsps.Queries.GetDsps;
-
-public sealed record DspDto(Guid Id, string Name);
 
 public sealed record GetDspsQuery : IRequest<IReadOnlyList<DspDto>>;
 
