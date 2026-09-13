@@ -1,10 +1,11 @@
 using System.Text;
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using TrackManagement.Api.Middleware;
+using TrackManagement.Api.Serialization;
 using TrackManagement.Api.Services;
 using TrackManagement.Application.Common.Auth;
 using TrackManagement.Application.Common.Interfaces;
@@ -22,7 +23,10 @@ public static class DependencyInjection
         // clients, and immune to a reordered enum silently changing meaning.
         services.AddControllers()
             .AddJsonOptions(options =>
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+                options.JsonSerializerOptions.Converters.Add(new StrictEnumConverterFactory()));
+
+        services.Configure<ApiBehaviorOptions>(options =>
+            options.InvalidModelStateResponseFactory = ModelStateProblemFactory.Create);
 
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();

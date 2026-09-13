@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TrackManagement.Application.Common.Pagination;
 using TrackManagement.Application.Tracks.Commands.CreateTrack;
+using TrackManagement.Application.Tracks.Commands.DistributeTrack;
+using TrackManagement.Application.Tracks.Commands.UpdateDistributionStatus;
 using TrackManagement.Application.Tracks.Commands.UpdateTrack;
+using TrackManagement.Application.Tracks.Commands.UpdateTrackStatus;
 using TrackManagement.Application.Tracks.Commands.UpsertTrackMetadata;
 using TrackManagement.Application.Tracks.Dtos;
 using TrackManagement.Application.Tracks.Queries.GetTrackById;
@@ -91,5 +94,52 @@ public class TracksController(ISender sender) : ControllerBase
                 request.Label,
                 request.CoverArtUrl,
                 request.CopyrightLine),
+            cancellationToken));
+
+    /// <summary>
+    /// Submits a track to one or more DSPs and marks it distributed. DSPs it already sits with are
+    /// reported back as skipped rather than treated as an error.
+    /// </summary>
+    [HttpPost("{id:guid}/distribute")]
+    [Authorize(Roles = nameof(Role.Distributor))]
+    [ProducesResponseType<DistributeTrackResult>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<DistributeTrackResult>> Distribute(
+        Guid id,
+        DistributeTrackRequest request,
+        CancellationToken cancellationToken) =>
+        Ok(await sender.Send(new DistributeTrackCommand(id, request.DspIds), cancellationToken));
+
+    /// <summary>Sets a track's own status. Available as a manual override at any time.</summary>
+    [HttpPatch("{id:guid}/status")]
+    [Authorize(Roles = nameof(Role.Distributor))]
+    [ProducesResponseType<TrackStatusChangeResult>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<TrackStatusChangeResult>> UpdateStatus(
+        Guid id,
+        UpdateTrackStatusRequest request,
+        CancellationToken cancellationToken) =>
+        Ok(await sender.Send(
+            new UpdateTrackStatusCommand(id, request.Status, request.Reason),
+            cancellationToken));
+
+    /// <summary>Sets the status of one DSP distribution, optionally recording why.</summary>
+    [HttpPatch("{id:guid}/distributions/{distributionId:guid}/status")]
+    [Authorize(Roles = nameof(Role.Distributor))]
+    [ProducesResponseType<DistributionStatusChangeResult>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<DistributionStatusChangeResult>> UpdateDistributionStatus(
+        Guid id,
+        Guid distributionId,
+        UpdateDistributionStatusRequest request,
+        CancellationToken cancellationToken) =>
+        Ok(await sender.Send(
+            new UpdateDistributionStatusCommand(id, distributionId, request.Status, request.Reason),
             cancellationToken));
 }
