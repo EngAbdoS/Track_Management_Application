@@ -5,7 +5,11 @@
 </p>
 
 @if (auth.canWrite()) {
-  <form class="add" (ngSubmit)="add()">
+  <!-- The native submit event, not (ngSubmit): that one is an output of NgForm, so it
+       only fires when FormsModule is imported. This page needs no forms machinery — one
+       text box and a button — and binding ngSubmit without it silently does nothing,
+       leaving the submit button to reload the page. -->
+  <form class="add" (submit)="$event.preventDefault(); add()">
     <app-field label="Add a genre" [error]="addError()">
       <div class="add__row">
         <input
