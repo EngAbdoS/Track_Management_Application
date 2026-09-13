@@ -33,14 +33,12 @@
     </app-field>
   }
 
-  <app-field label="Genre" [error]="errorFor('genreId')">
-    <select formControlName="genreId" required>
-      <option value="" disabled>Choose a genre</option>
-      @for (genre of genres(); track genre.id) {
-        <option [value]="genre.id">{{ genre.name }}</option>
-      }
-    </select>
-  </app-field>
+  <app-genre-picker
+    [genres]="genres()"
+    [value]="form.controls.genreId.value"
+    [fieldError]="errorFor('genreId')"
+    (selected)="form.controls.genreId.setValue($event)"
+  />
 
   <app-field
     label="ISRC"

@@ -48,6 +48,20 @@ export const routes: Routes = [
       import('./features/artists/pages/artist-list/artist-list').then((m) => m.ArtistList),
   },
   {
+    path: 'artists/new',
+    title: 'New artist',
+    canActivate: [authGuard, distributorGuard],
+    loadComponent: () =>
+      import('./features/artists/pages/artist-form/artist-form').then((m) => m.ArtistForm),
+  },
+  {
+    path: 'artists/:id/edit',
+    title: 'Edit artist',
+    canActivate: [authGuard, distributorGuard],
+    loadComponent: () =>
+      import('./features/artists/pages/artist-form/artist-form').then((m) => m.ArtistForm),
+  },
+  {
     path: 'genres',
     title: 'Genres',
     canActivate: [authGuard],

@@ -1,0 +1,65 @@
+<h1>Genres</h1>
+<p class="muted">
+  Spelling variants fold into one genre — <bdi>شعبى</bdi> and <bdi>شعبي</bdi> are the same, as are
+  <span class="code">pop</span> and <span class="code">POP</span>.
+</p>
+
+@if (auth.canWrite()) {
+  <form class="add" (ngSubmit)="add()">
+    <app-field label="Add a genre" [error]="addError()">
+      <div class="add__row">
+        <input
+          type="text"
+          [value]="draft()"
+          [disabled]="adding()"
+          placeholder="e.g. Shaabi or شعبي"
+          (input)="draft.set($any($event.target).value)"
+        />
+        <button appButton variant="primary" type="submit" [disabled]="adding() || !draft().trim()">
+          {{ adding() ? 'Adding…' : 'Add' }}
+        </button>
+      </div>
+    </app-field>
+  </form>
+}
+
+@if (errorMessage(); as message) {
+  <div class="state" role="alert">
+    <p>{{ message }}</p>
+    <button appButton type="button" (click)="load(currentPage())">Try again</button>
+  </div>
+} @else if (loading() && result().items.length === 0) {
+  <div class="table-wrap">
+    <app-skeleton [rows]="6" label="Loading genres" />
+  </div>
+} @else if (result().items.length === 0) {
+  <div class="table-wrap">
+    <app-empty-state title="No genres yet" detail="Add one above, or create it while adding a track." />
+  </div>
+} @else {
+  <div class="table-wrap" [class.is-stale]="loading()">
+    <table class="table">
+      <caption class="sr-only">Genres in the catalogue</caption>
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (genre of result().items; track genre.id) {
+          <tr>
+            <td><bdi>{{ genre.name }}</bdi></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination
+    [page]="result().page"
+    [pageSize]="result().pageSize"
+    [totalCount]="result().totalCount"
+    [totalPages]="result().totalPages"
+    (goTo)="goToPage($event)"
+  />
+}

@@ -13,11 +13,12 @@ import { Button } from '../../../../shared/ui/button/button';
 import { Field } from '../../../../shared/ui/field/field';
 import { ArtistsApi } from '../../../artists/data/artists.api';
 import { GenresApi } from '../../../genres/data/genres.api';
+import { GenrePicker } from '../../../genres/ui/genre-picker/genre-picker';
 import { TracksApi } from '../../data/tracks.api';
 
 @Component({
   selector: 'app-track-form',
-  imports: [ReactiveFormsModule, RouterLink, Field, Button],
+  imports: [ReactiveFormsModule, RouterLink, Field, Button, GenrePicker],
   templateUrl: './track-form.html',
   styleUrl: './track-form.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

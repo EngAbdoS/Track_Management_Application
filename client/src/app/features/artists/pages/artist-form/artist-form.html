@@ -1,0 +1,42 @@
+<p class="back">
+  <a routerLink="/artists">&larr; All artists</a>
+</p>
+
+<h1>{{ isEdit() ? 'Edit artist' : 'New artist' }}</h1>
+
+@if (error(); as message) {
+  <p class="banner" role="alert">{{ message }}</p>
+}
+
+<form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <app-field label="Name" [error]="errorFor('name')">
+    <input type="text" formControlName="name" required [attr.aria-invalid]="!!errorFor('name')" />
+  </app-field>
+
+  <app-field label="Email" [error]="errorFor('email')" hint="Must be unique across artists.">
+    <input
+      type="text"
+      formControlName="email"
+      required
+      autocapitalize="none"
+      spellcheck="false"
+      [attr.aria-invalid]="!!errorFor('email')"
+    />
+  </app-field>
+
+  <app-field label="Country" [error]="errorFor('country')">
+    <select formControlName="country" required>
+      <option value="" disabled>Choose a country</option>
+      @for (country of countries; track country.code) {
+        <option [value]="country.code">{{ country.name }} ({{ country.code }})</option>
+      }
+    </select>
+  </app-field>
+
+  <div class="actions">
+    <a appButton routerLink="/artists">Cancel</a>
+    <button appButton variant="primary" type="submit" [disabled]="pending() || loading()">
+      {{ pending() ? 'Saving…' : isEdit() ? 'Save changes' : 'Add artist' }}
+    </button>
+  </div>
+</form>

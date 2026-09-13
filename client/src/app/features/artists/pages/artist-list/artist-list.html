@@ -1,0 +1,69 @@
+<div class="head">
+  <div>
+    <h1>Artists</h1>
+    <p class="muted">Everyone whose catalogue we distribute.</p>
+  </div>
+
+  @if (auth.canWrite()) {
+    <a appButton variant="primary" routerLink="/artists/new">New artist</a>
+  }
+</div>
+
+@if (errorMessage(); as message) {
+  <div class="state" role="alert">
+    <p>{{ message }}</p>
+    <button appButton type="button" (click)="store.load(currentPage())">Try again</button>
+  </div>
+} @else if (store.loading() && store.artists().length === 0) {
+  <div class="table-wrap">
+    <app-skeleton [rows]="6" label="Loading artists" />
+  </div>
+} @else if (store.isEmpty()) {
+  <div class="table-wrap">
+    <app-empty-state title="No artists yet" detail="Add an artist before creating tracks.">
+      @if (auth.canWrite()) {
+        <a appButton variant="primary" routerLink="/artists/new">New artist</a>
+      }
+    </app-empty-state>
+  </div>
+} @else {
+  <div class="table-wrap" [class.is-stale]="store.loading()">
+    <table class="table">
+      <caption class="sr-only">
+        Artists with their contact email and country
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Email</th>
+          <th scope="col">Country</th>
+          @if (auth.canWrite()) {
+            <th scope="col"><span class="sr-only">Actions</span></th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (artist of store.artists(); track artist.id) {
+          <tr>
+            <td><bdi>{{ artist.name }}</bdi></td>
+            <td class="email">{{ artist.email }}</td>
+            <td>{{ country(artist.country) }} <span class="muted code">{{ artist.country }}</span></td>
+            @if (auth.canWrite()) {
+              <td class="actions">
+                <a appButton small [routerLink]="['/artists', artist.id, 'edit']">Edit</a>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination
+    [page]="store.result().page"
+    [pageSize]="store.result().pageSize"
+    [totalCount]="store.result().totalCount"
+    [totalPages]="store.result().totalPages"
+    (goTo)="goToPage($event)"
+  />
+}
