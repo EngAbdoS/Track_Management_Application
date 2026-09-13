@@ -1,0 +1,72 @@
+<p class="back">
+  <a [routerLink]="isEdit() ? ['/tracks', id()] : ['/tracks']">&larr; {{ isEdit() ? 'Back to track' : 'All tracks' }}</a>
+</p>
+
+<h1>{{ isEdit() ? 'Edit track' : 'New track' }}</h1>
+<p class="muted lede">
+  {{ isEdit() ? 'Changes apply immediately.' : 'New tracks start as a draft — nothing is sent to a DSP yet.' }}
+</p>
+
+@if (error(); as message) {
+  <p class="banner" role="alert">{{ message }}</p>
+}
+
+<form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <app-field label="Title" [error]="errorFor('title')">
+    <input type="text" formControlName="title" required [attr.aria-invalid]="!!errorFor('title')" />
+  </app-field>
+
+  @if (isEdit()) {
+    <!-- Read-only by design: the update endpoint has no artist field, so offering a
+         dropdown here would promise something the API cannot do. -->
+    <app-field label="Artist" hint="A track cannot be moved between artists.">
+      <input type="text" [value]="artistName() ?? ''" disabled />
+    </app-field>
+  } @else {
+    <app-field label="Artist" [error]="errorFor('artistId')">
+      <select formControlName="artistId" required>
+        <option value="" disabled>Choose an artist</option>
+        @for (artist of artists(); track artist.id) {
+          <option [value]="artist.id">{{ artist.name }}</option>
+        }
+      </select>
+    </app-field>
+  }
+
+  <app-field label="Genre" [error]="errorFor('genreId')">
+    <select formControlName="genreId" required>
+      <option value="" disabled>Choose a genre</option>
+      @for (genre of genres(); track genre.id) {
+        <option [value]="genre.id">{{ genre.name }}</option>
+      }
+    </select>
+  </app-field>
+
+  <app-field
+    label="ISRC"
+    [error]="errorFor('isrc')"
+    hint="Hyphens and spaces are fine — they are stripped."
+  >
+    <input
+      type="text"
+      formControlName="isrc"
+      required
+      autocapitalize="characters"
+      spellcheck="false"
+      placeholder="EGA012400001"
+      [attr.aria-invalid]="!!errorFor('isrc')"
+    />
+  </app-field>
+
+  <!-- No max date: scheduled releases are normal and legitimately sit in the future. -->
+  <app-field label="Release date" [error]="errorFor('releaseDate')">
+    <input type="date" formControlName="releaseDate" required />
+  </app-field>
+
+  <div class="actions">
+    <a appButton [routerLink]="isEdit() ? ['/tracks', id()] : ['/tracks']">Cancel</a>
+    <button appButton variant="primary" type="submit" [disabled]="pending() || loading()">
+      {{ pending() ? 'Saving…' : isEdit() ? 'Save changes' : 'Create track' }}
+    </button>
+  </div>
+</form>

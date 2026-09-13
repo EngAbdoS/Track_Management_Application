@@ -1,12 +1,13 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { TrackDistributionDto } from '../../../../models/api.models';
+import { Button } from '../../../../shared/ui/button/button';
 import { DspStatus } from '../../../../shared/ui/status/dsp-status';
 import { StatusTimeline } from '../status-timeline/status-timeline';
 
 @Component({
   selector: 'app-distributions-table',
-  imports: [DatePipe, DspStatus, StatusTimeline],
+  imports: [DatePipe, DspStatus, StatusTimeline, Button],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="table-wrap">
@@ -29,6 +30,11 @@ import { StatusTimeline } from '../status-timeline/status-timeline';
               <td class="num">{{ distribution.submittedAt | date: 'd MMM y' }}</td>
               <td><app-dsp-status [status]="distribution.status" /></td>
               <td class="actions">
+                @if (canWrite()) {
+                  <button appButton small type="button" (click)="changeStatus.emit(distribution)">
+                    Update
+                  </button>
+                }
                 <button
                   type="button"
                   class="toggle"
@@ -56,7 +62,9 @@ import { StatusTimeline } from '../status-timeline/status-timeline';
   `,
   styles: `
     .actions {
-      text-align: end;
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-2);
     }
 
     .toggle {
@@ -81,6 +89,9 @@ import { StatusTimeline } from '../status-timeline/status-timeline';
 })
 export class DistributionsTable {
   readonly distributions = input.required<readonly TrackDistributionDto[]>();
+  readonly canWrite = input(false);
+
+  readonly changeStatus = output<TrackDistributionDto>();
 
   private readonly expanded = signal<ReadonlySet<string>>(new Set());
 

@@ -5,9 +5,7 @@
   </div>
 
   @if (auth.canWrite()) {
-    <button appButton variant="primary" type="button" disabled title="Arrives in phase C7">
-      New track
-    </button>
+    <a appButton variant="primary" routerLink="/tracks/new">New track</a>
   }
 </div>
 

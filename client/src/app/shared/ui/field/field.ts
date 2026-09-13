@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 /**
  * Label, control and error message as one unit. The control is projected rather than
@@ -62,5 +62,6 @@ export class Field {
   readonly label = input.required<string>();
   readonly error = input<string | null>(null);
   readonly hint = input<string | null>(null);
-  readonly optional = input(false);
+  /** Bare attribute: <app-field label="BPM" optional>. */
+  readonly optional = input(false, { transform: booleanAttribute });
 }

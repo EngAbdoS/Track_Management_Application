@@ -1,0 +1,40 @@
+.back {
+  margin-block-end: var(--space-4);
+
+  a {
+    text-decoration: none;
+    font-weight: 550;
+  }
+}
+
+.lede {
+  margin-block-start: var(--space-1);
+}
+
+.banner {
+  margin-block-start: var(--space-4);
+  padding: var(--space-3);
+  border: 1px solid var(--dsp-rejected);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--dsp-rejected) 10%, transparent);
+}
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+  max-width: 720px;
+  margin-block-start: var(--space-5);
+  padding: var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-block-start: var(--space-2);
+}

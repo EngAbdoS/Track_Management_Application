@@ -19,7 +19,13 @@
     </div>
 
     <div class="head__status">
-      <app-status-pill [status]="track.status" />
+      <div class="head__pill">
+        <app-status-pill [status]="track.status" />
+        @if (auth.canWrite()) {
+          <button appButton small type="button" (click)="open('trackStatus')">Change</button>
+        }
+      </div>
+
       <!-- Said explicitly, because track.status cannot answer it: a Distributed track
            whose DSPs all rejected it is live nowhere. -->
       <p class="live muted">
@@ -31,6 +37,10 @@
           Live on no DSPs
         }
       </p>
+
+      @if (auth.canWrite()) {
+        <a appButton small [routerLink]="['/tracks', track.id, 'edit']">Edit track</a>
+      }
     </div>
   </header>
 
@@ -45,7 +55,7 @@
     <div class="section__head">
       <h2>Distribution</h2>
       @if (auth.canWrite()) {
-        <button appButton variant="primary" small type="button" disabled title="Arrives in phase C7">
+        <button appButton variant="primary" small type="button" (click)="open('distribute')">
           Distribute
         </button>
       }
@@ -56,10 +66,20 @@
         <app-empty-state
           title="Not distributed yet"
           detail="This track has not been submitted to any DSP."
-        />
+        >
+          @if (auth.canWrite()) {
+            <button appButton variant="primary" type="button" (click)="open('distribute')">
+              Distribute now
+            </button>
+          }
+        </app-empty-state>
       </div>
     } @else {
-      <app-distributions-table [distributions]="store.distributions()" />
+      <app-distributions-table
+        [distributions]="store.distributions()"
+        [canWrite]="auth.canWrite()"
+        (changeStatus)="openDistributionStatus($event)"
+      />
     }
 
     <p class="legend muted">
@@ -70,7 +90,15 @@
   </section>
 
   <section class="section">
-    <h2>Metadata</h2>
+    <div class="section__head">
+      <h2>Metadata</h2>
+      @if (auth.canWrite()) {
+        <button appButton small type="button" (click)="open('metadata')">
+          {{ track.metadata ? 'Edit metadata' : 'Add metadata' }}
+        </button>
+      }
+    </div>
+
     @if (metadataRows().length === 0) {
       <p class="muted">No metadata recorded.</p>
     } @else {
@@ -89,4 +117,49 @@
     <h2>Track history</h2>
     <app-status-timeline [entries]="track.statusHistory" />
   </section>
+
+  @if (auth.canWrite()) {
+    <app-distribute-dialog
+      [dsps]="dsps()"
+      [distributions]="store.distributions()"
+      [open]="dialog() === 'distribute'"
+      [pending]="store.saving()"
+      [error]="dialogError()"
+      (confirmed)="distribute($event)"
+      (cancelled)="close()"
+    />
+
+    <app-status-change-dialog
+      heading="Change track status"
+      [current]="track.status"
+      [options]="trackStatuses"
+      [open]="dialog() === 'trackStatus'"
+      [pending]="store.saving()"
+      [error]="dialogError()"
+      (confirmed)="changeTrackStatus($event)"
+      (cancelled)="close()"
+    />
+
+    @if (editingDistribution(); as distribution) {
+      <app-status-change-dialog
+        [heading]="'Update ' + distribution.dspName"
+        [current]="distribution.status"
+        [options]="distributionOptions()"
+        [open]="dialog() === 'distributionStatus'"
+        [pending]="store.saving()"
+        [error]="dialogError()"
+        (confirmed)="changeDistributionStatus($event)"
+        (cancelled)="close()"
+      />
+    }
+
+    <app-metadata-form
+      [metadata]="track.metadata"
+      [open]="dialog() === 'metadata'"
+      [pending]="store.saving()"
+      [error]="dialogError()"
+      (saved)="saveMetadata($event)"
+      (cancelled)="close()"
+    />
+  }
 }

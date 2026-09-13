@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { anonymousGuard, authGuard } from './core/auth/auth.guard';
+import { anonymousGuard, authGuard, distributorGuard } from './core/auth/auth.guard';
 
 // Every page is lazy, so a route only costs what it renders. Write routes pick up
 // distributorGuard as they are built out in C7 and C8.
@@ -18,12 +18,27 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/tracks/pages/track-list/track-list').then((m) => m.TrackList),
   },
+  // Ahead of 'tracks/:id', or "new" would be read as an id.
+  {
+    path: 'tracks/new',
+    title: 'New track',
+    canActivate: [authGuard, distributorGuard],
+    loadComponent: () =>
+      import('./features/tracks/pages/track-form/track-form').then((m) => m.TrackForm),
+  },
   {
     path: 'tracks/:id',
     title: 'Track',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/tracks/pages/track-detail/track-detail').then((m) => m.TrackDetail),
+  },
+  {
+    path: 'tracks/:id/edit',
+    title: 'Edit track',
+    canActivate: [authGuard, distributorGuard],
+    loadComponent: () =>
+      import('./features/tracks/pages/track-form/track-form').then((m) => m.TrackForm),
   },
   {
     path: 'artists',
